@@ -15,13 +15,5 @@
         "dest": "server.js"
       }
       
-    ],
-    "rewrites": [
-      {
-        "source": "/"
-      },
-      {
-        "source": "/registrar_ponto"
-      }
     ]
   }
