@@ -3,16 +3,17 @@
     "builds": [
       {
         "src": "server.js",
-        "use": "@vercel/node",
-        "config": {
-          "includeFiles": ["db.json"]
-        }
+        "use": "@vercel/node"
       }
     ],
-    "routes": [
+    "rewrites": [
       {
-        "src": "/(.*)",
-        "dest": "server.js"
+        "source": "/",
+        "function": "app"
+      },
+      {
+        "source": "/registrar_ponto",
+        "function": "app"
       }
     ]
   }
