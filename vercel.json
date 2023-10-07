@@ -18,12 +18,10 @@
     ],
     "rewrites": [
       {
-        "source": "/",
-        "function": "app"
+        "source": "/"
       },
       {
-        "source": "/registrar_ponto",
-        "function": "app"
+        "source": "/registrar_ponto"
       }
     ]
   }
