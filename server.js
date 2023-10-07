@@ -1,6 +1,8 @@
-const express = require('express');
+// JSON Server module
+const jsonServer = require("json-server");
+const server = jsonServer.create();
+const router = jsonServer.router("db.json");
 const admin = require('firebase-admin');
-const app = express();
 
 const serviceAccount = require('./serviceAccountKey.json'); // Substitua pelo caminho para seu arquivo de chave de serviço do Firebase
 
@@ -9,13 +11,18 @@ admin.initializeApp({
   databaseURL: 'https://ectecnoponto-default-rtdb.firebaseio.com', // Substitua pelo URL do seu banco de dados Firebase
 });
 
+// Make sure to use the default middleware
+const middlewares = jsonServer.defaults();
 
-const port = process.env.PORT || 3000;
+server.use(middlewares);
+// Add this before server.use(router)
+server.use(
+ // Add custom route here if needed
+ jsonServer.rewriter({
+  "/*": "/$1",
+ })
+);
 
-// Middleware para processar JSON
-app.use(express.json());
-
-// Rota para registrar uma batida de ponto via URL
 app.get('/registrar_ponto', (req, res) => {
   const usuario = req.query.usuario; // Lê o parâmetro 'usuario' da URL
 
@@ -41,7 +48,12 @@ app.get('/registrar_ponto', (req, res) => {
   });
 });
 
-// Inicie o servidor
-app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
+
+server.use(router);
+// Listen to port
+server.listen(3000, () => {
+ console.log("JSON Server is running");
 });
+
+// Export the Server API
+module.exports = server;
