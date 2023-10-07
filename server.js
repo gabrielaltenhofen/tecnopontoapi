@@ -1,30 +1,28 @@
-// JSON Server module
 const jsonServer = require("json-server");
 const server = jsonServer.create();
 const router = jsonServer.router("db.json");
 const admin = require('firebase-admin');
 
-const serviceAccount = require('./serviceAccountKey.json'); // Substitua pelo caminho para seu arquivo de chave de serviço do Firebase
+const serviceAccount = require('./serviceAccountKey.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://ectecnoponto-default-rtdb.firebaseio.com', // Substitua pelo URL do seu banco de dados Firebase
+  databaseURL: 'https://ectecnoponto-default-rtdb.firebaseio.com',
 });
 
-// Make sure to use the default middleware
 const middlewares = jsonServer.defaults();
 
 server.use(middlewares);
-// Add this before server.use(router)
+
 server.use(
- // Add custom route here if needed
- jsonServer.rewriter({
-  "/*": "/$1",
- })
+  jsonServer.rewriter({
+    "/*": "/$1",
+  })
 );
 
-app.get('/registrar_ponto', (req, res) => {
-  const usuario = req.query.usuario; // Lê o parâmetro 'usuario' da URL
+// Defina a rota para registrar ponto
+server.get('/registrar_ponto', (req, res) => {
+  const usuario = req.query.usuario;
 
   if (!usuario) {
     return res.status(400).json({ error: 'Parâmetro "usuario" é obrigatório na URL' });
@@ -48,12 +46,8 @@ app.get('/registrar_ponto', (req, res) => {
   });
 });
 
-
 server.use(router);
-// Listen to port
-server.listen(3000, () => {
- console.log("JSON Server is running");
-});
 
-// Export the Server API
-module.exports = server;
+server.listen(3000, () => {
+  console.log("JSON Server is running");
+});
