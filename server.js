@@ -3,7 +3,6 @@ const server = jsonServer.create();
 const router = jsonServer.router("db.json");
 const admin = require('firebase-admin');
 
-
 const serviceAccount = require('./serviceAccountKey.json');
 
 admin.initializeApp({
@@ -21,6 +20,17 @@ server.use(
   })
 );
 
+// Função para formatar a data e hora no fuso horário de Brasília
+function getHoraBrasilia() {
+  const now = new Date();
+  const hora = now.getHours().toString().padStart(2, '0');
+  const minutos = now.getMinutes().toString().padStart(2, '0');
+  const dia = now.getDate().toString().padStart(2, '0');
+  const mes = (now.getMonth() + 1).toString().padStart(2, '0'); // Os meses começam em 0
+  const ano = now.getFullYear();
+  return `${hora}:${minutos} - ${dia}/${mes}/${ano}`;
+}
+
 // Defina a rota para registrar ponto
 server.get('/registrar_ponto', (req, res) => {
   const usuario = req.query.usuario;
@@ -32,9 +42,11 @@ server.get('/registrar_ponto', (req, res) => {
   const db = admin.database();
   const ref = db.ref('batidas_de_ponto');
 
+  const horaAtual = getHoraBrasilia();
+
   const novaBatida = {
     usuario,
-    data_hora: new Date().toString(),
+    data_hora: horaAtual,
   };
 
   ref.push(novaBatida, (error) => {
