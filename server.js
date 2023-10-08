@@ -20,15 +20,11 @@ server.use(
   })
 );
 
-// Função para formatar a data e hora no fuso horário de Brasília
-function getHoraBrasilia() {
-  const now = new Date();
-  const hora = now.getHours().toString().padStart(2, '0');
-  const minutos = now.getMinutes().toString().padStart(2, '0');
-  const dia = now.getDate().toString().padStart(2, '0');
-  const mes = (now.getMonth() + 1).toString().padStart(2, '0'); // Os meses começam em 0
-  const ano = now.getFullYear();
-  return `${hora}:${minutos} - ${dia}/${mes}/${ano}`;
+// Função para ajustar a hora para Brasília (GMT-3)
+function ajustarHoraParaBrasilia(data) {
+  const dataBrasilia = new Date(data);
+  dataBrasilia.setHours(dataBrasilia.getHours() - 3); // Ajuste para GMT-3
+  return dataBrasilia;
 }
 
 // Defina a rota para registrar ponto
@@ -42,7 +38,11 @@ server.get('/registrar_ponto', (req, res) => {
   const db = admin.database();
   const ref = db.ref('batidas_de_ponto');
 
-  const horaAtual = getHoraBrasilia();
+  const dataHoraBrasilia = ajustarHoraParaBrasilia(new Date());
+  const horaFormatada = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const dataFormatada = dataHoraBrasilia.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  const horaAtual = `${horaFormatada} - ${dataFormatada}`;
 
   const novaBatida = {
     usuario,
