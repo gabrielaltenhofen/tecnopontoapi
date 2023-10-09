@@ -20,36 +20,33 @@ server.use(
   })
 );
 
-// Função para obter a hora atual formatada no fuso horário de Brasília
-function obterHoraFormatadaBrasilia() {
-  const dataAtual = new Date();
-  const options = {
-    timeZone: 'America/Sao_Paulo',
-    hour: '2-digit',
-    minute: '2-digit',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  };
-  return dataAtual.toLocaleString('pt-BR', options);
+// Função para ajustar a hora para Brasília (GMT-3)
+function ajustarHoraParaBrasilia(data) {
+  const dataBrasilia = new Date(data);
+  dataBrasilia.setHours(dataBrasilia.getHours() - 3); // Ajuste para GMT-3
+  return dataBrasilia;
 }
 
 // Defina a rota para registrar ponto
-server.post('/registrar_ponto', (req, res) => {
-  const { usuario } = req.body;
+server.get('/registrar_ponto', (req, res) => {
+  const usuario = req.query.usuario;
 
   if (!usuario) {
-    return res.status(400).json({ error: 'Parâmetro "usuario" é obrigatório no corpo da solicitação' });
+    return res.status(400).json({ error: 'Parâmetro "usuario" é obrigatório na URL' });
   }
 
   const db = admin.database();
   const ref = db.ref('batidas_de_ponto');
 
-  const horaAtualBrasilia = obterHoraFormatadaBrasilia();
+  const dataHoraBrasilia = ajustarHoraParaBrasilia(new Date());
+  const horaFormatada = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const dataFormatada = dataHoraBrasilia.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  const horaAtual = `${horaFormatada} - ${dataFormatada}`;
 
   const novaBatida = {
     usuario,
-    data_hora: horaAtualBrasilia,
+    data_hora: horaAtual,
   };
 
   ref.push(novaBatida, (error) => {
