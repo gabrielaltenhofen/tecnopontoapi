@@ -42,22 +42,31 @@ server.get('/registrar_ponto', (req, res) => {
   const db = admin.database();
   const ref = db.ref(`batidas_de_ponto/${usuario}/${ano}/${mes}/${dia}`);
 
-  const horaFormatada = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  const dataFormatada = dataHoraBrasilia.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-  const horaAtual = `${horaFormatada} - ${dataFormatada}`;
-
-  const novaBatida = {
-    data_hora: horaAtual,
-  };
-
-  ref.push(novaBatida, (error) => {
-    if (error) {
-      console.error('Erro ao registrar ponto:', error);
-      res.status(500).json({ error: 'Erro interno do servidor' });
-    } else {
-      res.json({ message: 'Batida de ponto registrada com sucesso!' });
+  // Verifique o número de batidas já registradas para o dia
+  ref.once('value', (snapshot) => {
+    const batidasDoDia = snapshot.numChildren();
+    
+    if (batidasDoDia >= 4) {
+      return res.status(400).json({ error: 'Limite de batidas de ponto para o dia atingido (máximo 4).' });
     }
+
+    const horaFormatada = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const dataFormatada = dataHoraBrasilia.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    const horaAtual = `${horaFormatada} - ${dataFormatada}`;
+
+    const novaBatida = {
+      data_hora: horaAtual,
+    };
+
+    ref.push(novaBatida, (error) => {
+      if (error) {
+        console.error('Erro ao registrar ponto:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+      } else {
+        res.json({ message: 'Batida de ponto registrada com sucesso!' });
+      }
+    });
   });
 });
 server.use(router);
