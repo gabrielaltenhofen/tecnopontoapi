@@ -29,23 +29,25 @@ function ajustarHoraParaBrasilia(data) {
 
 // Defina a rota para registrar ponto
 server.get('/registrar_ponto', (req, res) => {
-  const usuario = req.query.usuario;
+  const usuario = req.query.usuario; // ID do funcionário
+  const dataHoraBrasilia = ajustarHoraParaBrasilia(new Date());
+  const ano = dataHoraBrasilia.getFullYear();
+  const mes = dataHoraBrasilia.getMonth() + 1; // Mês começa em 0
+  const dia = dataHoraBrasilia.getDate();
 
   if (!usuario) {
     return res.status(400).json({ error: 'Parâmetro "usuario" é obrigatório na URL' });
   }
 
   const db = admin.database();
-  const ref = db.ref('batidas_de_ponto');
+  const ref = db.ref(`batidas_de_ponto/${usuario}/${ano}/${mes}/${dia}`);
 
-  const dataHoraBrasilia = ajustarHoraParaBrasilia(new Date());
   const horaFormatada = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   const dataFormatada = dataHoraBrasilia.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   const horaAtual = `${horaFormatada} - ${dataFormatada}`;
 
   const novaBatida = {
-    usuario,
     data_hora: horaAtual,
   };
 
@@ -58,7 +60,6 @@ server.get('/registrar_ponto', (req, res) => {
     }
   });
 });
-
 server.use(router);
 
 server.listen(3000, () => {
