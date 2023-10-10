@@ -50,47 +50,41 @@ server.get('/registrar_ponto', (req, res) => {
       return res.status(400).json({ error: 'Limite de batidas de ponto para o dia atingido (máximo 4).' });
     }
 
-    // Verifique o tempo entre as batidas
+    let batidaExistente = false;
+    // Verifique o tempo entre as batidas e se a batida atual já existe
     snapshot.forEach((childSnapshot) => {
       const batida = childSnapshot.val();
       const horaRegistrada = new Date(batida.data_hora);
       const diferencaMinutos = Math.abs((dataHoraBrasilia - horaRegistrada) / 60000);
 
       if (diferencaMinutos < 5) {
+        batidaExistente = true;
         return res.status(400).json({ error: 'Tempo mínimo entre batidas não atingido (mínimo 5 minutos).' });
       }
     });
 
-    const horaFormatada = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    const dataFormatada = dataHoraBrasilia.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    if (!batidaExistente) {
+      const horaFormatada = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      const dataFormatada = dataHoraBrasilia.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-    const horaAtual = `${horaFormatada} - ${dataFormatada}`;
+      const horaAtual = `${horaFormatada} - ${dataFormatada}`;
 
-    // Determine o nome da variável para a nova batida
-    const nomeVariavelNovaBatida = `data_hora${batidasDoDia + 1}`;
+      // Determine o nome da variável para a nova batida
+      const nomeVariavelNovaBatida = `data_hora${batidasDoDia + 1}`;
 
-    const novaBatida = {
-      [nomeVariavelNovaBatida]: horaAtual,
-    };
+      const novaBatida = {
+        [nomeVariavelNovaBatida]: horaAtual,
+      };
 
-    // Verifique se a última batida foi há mais de 5 minutos
-    if (batidasDoDia > 0) {
-      const ultimaBatida = snapshot.val()[Object.keys(snapshot.val())[batidasDoDia - 1]];
-      const horaUltimaBatida = new Date(ultimaBatida[nomeVariavelNovaBatida]);
-      const diferencaMinutosUltimaBatida = Math.abs((dataHoraBrasilia - horaUltimaBatida) / 60000);
-      if (diferencaMinutosUltimaBatida < 5) {
-        return res.status(400).json({ error: 'Tempo mínimo entre batidas não atingido (mínimo 5 minutos).' });
-      }
+      ref.push(novaBatida, (error) => {
+        if (error) {
+          console.error('Erro ao registrar ponto:', error);
+          res.status(500).json({ error: 'Erro interno do servidor' });
+        } else {
+          res.json({ message: 'Batida de ponto registrada com sucesso!' });
+        }
+      });
     }
-
-    ref.push(novaBatida, (error) => {
-      if (error) {
-        console.error('Erro ao registrar ponto:', error);
-        res.status(500).json({ error: 'Erro interno do servidor' });
-      } else {
-        res.json({ message: 'Batida de ponto registrada com sucesso!' });
-      }
-    });
   });
 });
 
