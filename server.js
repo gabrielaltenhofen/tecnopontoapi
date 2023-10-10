@@ -50,18 +50,16 @@ server.get('/registrar_ponto', (req, res) => {
       return res.status(400).json({ error: 'Limite de batidas de ponto para o dia atingido (máximo 4).' });
     }
 
-    if (batidasDoDia > 0) {
-      // Se já houver pelo menos uma batida registrada, verifique o tempo entre a última batida e a atual
-      snapshot.forEach((childSnapshot) => {
-        const batida = childSnapshot.val();
-        const horaRegistrada = new Date(batida.data_hora);
-        const diferencaMinutos = Math.abs((dataHoraBrasilia - horaRegistrada) / 60000);
+    // Verifique o tempo entre as batidas
+    snapshot.forEach((childSnapshot) => {
+      const batida = childSnapshot.val();
+      const horaRegistrada = new Date(batida.data_hora);
+      const diferencaMinutos = Math.abs((dataHoraBrasilia - horaRegistrada) / 60000);
 
-        if (diferencaMinutos < 5) {
-          return res.status(400).json({ error: 'Tempo mínimo entre batidas não atingido (mínimo 5 minutos).' });
-        }
-      });
-    }
+      if (diferencaMinutos < 5) {
+        return res.status(400).json({ error: 'Tempo mínimo entre batidas não atingido (mínimo 5 minutos).' });
+      }
+    });
 
     const horaFormatada = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     const dataFormatada = dataHoraBrasilia.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -75,6 +73,16 @@ server.get('/registrar_ponto', (req, res) => {
       [nomeVariavelNovaBatida]: horaAtual,
     };
 
+    // Verifique se a última batida foi há mais de 5 minutos
+    if (batidasDoDia > 0) {
+      const ultimaBatida = snapshot.val()[Object.keys(snapshot.val())[batidasDoDia - 1]];
+      const horaUltimaBatida = new Date(ultimaBatida[nomeVariavelNovaBatida]);
+      const diferencaMinutosUltimaBatida = Math.abs((dataHoraBrasilia - horaUltimaBatida) / 60000);
+      if (diferencaMinutosUltimaBatida < 5) {
+        return res.status(400).json({ error: 'Tempo mínimo entre batidas não atingido (mínimo 5 minutos).' });
+      }
+    }
+
     ref.push(novaBatida, (error) => {
       if (error) {
         console.error('Erro ao registrar ponto:', error);
@@ -85,6 +93,7 @@ server.get('/registrar_ponto', (req, res) => {
     });
   });
 });
+
 
 server.use(router);
 
