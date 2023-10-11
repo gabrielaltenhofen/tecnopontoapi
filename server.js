@@ -28,24 +28,25 @@ function ajustarHoraParaBrasilia(data) {
 }
 
 // Defina a rota para recuperar dados de batidas de ponto por funcionário, mês e dia
-server.get('/batidas_de_ponto/:usuario/:ano/:mes/:dia', (req, res) => {
+// Defina a rota para recuperar todas as batidas de um mês específico
+server.get('/batidas_de_ponto/:usuario/:ano/:mes', (req, res) => {
   const usuario = req.params.usuario;
   const ano = parseInt(req.params.ano);
   const mes = parseInt(req.params.mes);
-  const dia = parseInt(req.params.dia);
 
-  if (!usuario || !ano || !mes || !dia) {
+  if (!usuario || !ano || !mes) {
     return res.status(400).json({ error: 'Parâmetros inválidos na URL' });
   }
 
   const db = admin.database();
-  const ref = db.ref(`batidas_de_ponto/${usuario}/${ano}/${mes}/${dia}`);
+  const ref = db.ref(`batidas_de_ponto/${usuario}/${ano}/${mes}`);
 
   ref.once('value', (snapshot) => {
     const data = snapshot.val();
     res.json(data);
   });
 });
+
 
 
 // Defina a rota para registrar ponto
