@@ -27,6 +27,27 @@ function ajustarHoraParaBrasilia(data) {
   return dataBrasilia;
 }
 
+// Defina a rota para recuperar dados de batidas de ponto por funcionário, mês e dia
+server.get('/batidas_de_ponto/:usuario/:ano/:mes/:dia', (req, res) => {
+  const usuario = req.params.usuario;
+  const ano = parseInt(req.params.ano);
+  const mes = parseInt(req.params.mes);
+  const dia = parseInt(req.params.dia);
+
+  if (!usuario || !ano || !mes || !dia) {
+    return res.status(400).json({ error: 'Parâmetros inválidos na URL' });
+  }
+
+  const db = admin.database();
+  const ref = db.ref(`batidas_de_ponto/${usuario}/${ano}/${mes}/${dia}`);
+
+  ref.once('value', (snapshot) => {
+    const data = snapshot.val();
+    res.json(data);
+  });
+});
+
+
 // Defina a rota para registrar ponto
 server.get('/registrar_ponto', (req, res) => {
   const usuario = req.query.usuario; // ID do funcionário
