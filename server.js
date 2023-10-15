@@ -112,19 +112,25 @@ server.get('/registrar_ponto', (req, res) => {
   
 });
 
+// Defina a rota para consultar os dados de um funcionário por ID
+// Defina a rota para listar todos os funcionários com seus nomes
 server.get('/funcionario', (req, res) => {
   const db = admin.database();
-  const ref = db.ref('funcionario'); // Substitua 'funcionarios' pelo nome da tabela que você deseja consultar.
+  const ref = db.ref('funcionario'); // Use o nome correto da tabela, que é 'funcionario'.
 
   ref.once('value', (snapshot) => {
     const funcionarios = snapshot.val();
     if (!funcionarios) {
       return res.status(404).json({ error: 'Nenhum funcionário encontrado.' });
     }
-    const funcionariosList = Object.keys(funcionarios);
+
+    const funcionariosList = Object.values(funcionarios).map(funcionario => funcionario.name);
+
     res.json(funcionariosList);
   });
 });
+
+
 
 
 server.use(router);
