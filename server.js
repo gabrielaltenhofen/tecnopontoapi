@@ -114,6 +114,7 @@ server.get('/registrar_ponto', (req, res) => {
 
 // Defina a rota para consultar os dados de um funcionário por ID
 // Defina a rota para listar todos os funcionários com seus nomes
+// Defina a rota para listar todos os funcionários com seus nomes e IDs
 server.get('/funcionario', (req, res) => {
   const db = admin.database();
   const ref = db.ref('funcionario'); // Use o nome correto da tabela, que é 'funcionario'.
@@ -124,11 +125,15 @@ server.get('/funcionario', (req, res) => {
       return res.status(404).json({ error: 'Nenhum funcionário encontrado.' });
     }
 
-    const funcionariosList = Object.values(funcionarios).map(funcionario => funcionario.name);
+    const funcionariosList = Object.keys(funcionarios).map(id => ({
+      id,
+      name: funcionarios[id].name
+    }));
 
     res.json(funcionariosList);
   });
 });
+
 
 
 
