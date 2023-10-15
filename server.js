@@ -108,6 +108,22 @@ server.get('/registrar_ponto', (req, res) => {
       });
     }
   });
+
+  
+});
+
+server.get('/funcionarios', (req, res) => {
+  const db = admin.database();
+  const ref = db.ref('funcionarios'); // Substitua 'funcionarios' pelo nome da tabela que você deseja consultar.
+
+  ref.once('value', (snapshot) => {
+    const funcionarios = snapshot.val();
+    if (!funcionarios) {
+      return res.status(404).json({ error: 'Nenhum funcionário encontrado.' });
+    }
+    const funcionariosList = Object.keys(funcionarios);
+    res.json(funcionariosList);
+  });
 });
 
 
