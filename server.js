@@ -112,9 +112,9 @@ server.get('/registrar_ponto', (req, res) => {
   
 });
 
-server.get('/funcionarios', (req, res) => {
+server.get('/funcionario', (req, res) => {
   const db = admin.database();
-  const ref = db.ref('funcionarios'); // Substitua 'funcionarios' pelo nome da tabela que você deseja consultar.
+  const ref = db.ref('funcionario'); // Substitua 'funcionarios' pelo nome da tabela que você deseja consultar.
 
   ref.once('value', (snapshot) => {
     const funcionarios = snapshot.val();
