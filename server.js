@@ -133,6 +133,23 @@ server.get('/funcionario', (req, res) => {
   });
 });
 
+server.get('/registrar_batida_adicional', (req, res) => {
+  const usuario = req.query.usuario; // ID do funcionário
+  const dataHoraBrasilia = ajustarHoraParaBrasilia(new Date());
+  const ano = dataHoraBrasilia.getFullYear();
+  const mes = dataHoraBrasilia.getMonth() + 1; // Mês começa em 0
+  const dia = dataHoraBrasilia.getDate();
+
+  if (!usuario) {
+    return res.status(400).json({ error: 'Parâmetro "usuario" é obrigatório na URL' });
+  }
+
+  // Resto do código para registrar a batida adicional, similar ao que você já tinha
+
+  // Envie a resposta de volta para o cliente
+  res.json({ message: 'Batida de ponto registrada com sucesso!' });
+});
+
 
 server.use(router);
 
