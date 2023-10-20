@@ -48,11 +48,10 @@ server.get('/batidas_de_ponto/:usuario/:ano/:mes', (req, res) => {
 });
 
 
-
-// Defina a rota para registrar ponto
 server.get('/registrar_ponto', (req, res) => {
   const usuario = req.query.usuario; // ID do funcionário
   const dataHoraBrasilia = ajustarHoraParaBrasilia(new Date());
+  const hora = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   const ano = dataHoraBrasilia.getFullYear();
   const mes = dataHoraBrasilia.getMonth() + 1; // Mês começa em 0
   const dia = dataHoraBrasilia.getDate();
@@ -86,10 +85,7 @@ server.get('/registrar_ponto', (req, res) => {
     });
 
     if (!batidaExistente) {
-      const horaFormatada = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      const dataFormatada = dataHoraBrasilia.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-      const horaAtual = `${horaFormatada} - ${dataFormatada}`;
+      const horaAtual = hora;
 
       // Determine o nome da variável para a nova batida
       const nomeVariavelNovaBatida = `data_hora${batidasDoDia + 1}`;
@@ -108,9 +104,8 @@ server.get('/registrar_ponto', (req, res) => {
       });
     }
   });
-
-  
 });
+
 
 
 // Defina a rota para listar todos os funcionários com seus nomes e IDs
@@ -132,24 +127,6 @@ server.get('/funcionario', (req, res) => {
     res.json(funcionariosList);
   });
 });
-
-server.get('/registrar_batida_adicional', (req, res) => {
-  const usuario = req.query.usuario; // ID do funcionário
-  const dataHoraBrasilia = ajustarHoraParaBrasilia(new Date());
-  const ano = dataHoraBrasilia.getFullYear();
-  const mes = dataHoraBrasilia.getMonth() + 1; // Mês começa em 0
-  const dia = dataHoraBrasilia.getDate();
-
-  if (!usuario) {
-    return res.status(400).json({ error: 'Parâmetro "usuario" é obrigatório na URL' });
-  }
-
-  // Resto do código para registrar a batida adicional, similar ao que você já tinha
-
-  // Envie a resposta de volta para o cliente
-  res.json({ message: 'Batida de ponto registrada com sucesso!' });
-});
-
 
 server.use(router);
 
