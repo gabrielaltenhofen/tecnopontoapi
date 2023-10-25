@@ -71,40 +71,26 @@ server.get('/registrar_ponto', (req, res) => {
       return res.status(400).json({ error: 'Limite de batidas de ponto para o dia atingido (máximo 4).' });
     }
 
-    let batidaExistente = false;
-    // Verifique o tempo entre as batidas e se a batida atual já existe
-    snapshot.forEach((childSnapshot) => {
-      const batida = childSnapshot.val();
-      const horaRegistrada = new Date(batida.data_hora);
-      const diferencaMinutos = Math.abs((dataHoraBrasilia - horaRegistrada) / 60000);
+    // Determine o nome da variável para a nova batida
+    const nomeVariavelNovaBatida = `data_hora${batidasDoDia + 1}`;
+    const horaAtual = hora;
 
-      if (diferencaMinutos < 5) {
-        batidaExistente = true;
-        return res.status(400).json({ error: 'Tempo mínimo entre batidas não atingido (mínimo 5 minutos).' });
+    const novaBatida = {
+      [nomeVariavelNovaBatida]: horaAtual,
+    };
+
+    // Use `child` para definir a nova batida com um nome de campo específico
+    ref.child(nomeVariavelNovaBatida).set(novaBatida, (error) => {
+      if (error) {
+        console.error('Erro ao registrar ponto:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+      } else {
+        res.json({ message: 'Batida de ponto registrada com sucesso!' });
       }
     });
-
-    if (!batidaExistente) {
-      const horaAtual = hora;
-
-      // Determine o nome da variável para a nova batida
-      const nomeVariavelNovaBatida = `data_hora${batidasDoDia + 1}`;
-
-      const novaBatida = {
-        [nomeVariavelNovaBatida]: horaAtual,
-      };
-
-      ref.push(novaBatida, (error) => {
-        if (error) {
-          console.error('Erro ao registrar ponto:', error);
-          res.status(500).json({ error: 'Erro interno do servidor' });
-        } else {
-          res.json({ message: 'Batida de ponto registrada com sucesso!' });
-        }
-      });
-    }
   });
 });
+
 
 
 
