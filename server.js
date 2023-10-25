@@ -72,14 +72,14 @@ server.get('/registrar_ponto', (req, res) => {
     }
 
     // Determine o nome da variável para a nova batida
-    const nomeVariavelNovaBatida = `data_hora${batidasDoDia + 1}`;
+    const nomeVariavelNovaBatida = `batida${batidasDoDia + 1}`;
     const horaAtual = hora;
 
     const novaBatida = {
-      [nomeVariavelNovaBatida]: horaAtual,
+      data_hora: horaAtual,
     };
 
-    // Use `child` para definir a nova batida com um nome de campo específico
+    // Use `child` para definir a nova batida
     ref.child(nomeVariavelNovaBatida).set(novaBatida, (error) => {
       if (error) {
         console.error('Erro ao registrar ponto:', error);
@@ -90,6 +90,7 @@ server.get('/registrar_ponto', (req, res) => {
     });
   });
 });
+
 
 
 
