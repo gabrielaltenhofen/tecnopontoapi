@@ -66,20 +66,15 @@ server.get('/registrar_ponto', (req, res) => {
   // Verifique o número de batidas já registradas para o dia
   ref.once('value', (snapshot) => {
     const batidasDoDia = snapshot.numChildren();
-
-    if (batidasDoDia >= 4) {
-      return res.status(400).json({ error: 'Limite de batidas de ponto para o dia atingido (máximo 4).' });
-    }
-
     // Determine o nome da variável para a nova batida
-    const nomeVariavelNovaBatida = `batida${batidasDoDia + 1}`;
+    const nomeVariavelNovaBatida = `data_hora${batidasDoDia + 1}`;
     const horaAtual = hora;
 
     const novaBatida = {
-      data_hora: horaAtual,
+      [nomeVariavelNovaBatida]: horaAtual,
     };
 
-    // Use `child` para definir a nova batida
+    // Use `child` para definir a nova batida com um nome de campo específico
     ref.child(nomeVariavelNovaBatida).set(novaBatida, (error) => {
       if (error) {
         console.error('Erro ao registrar ponto:', error);
@@ -90,7 +85,6 @@ server.get('/registrar_ponto', (req, res) => {
     });
   });
 });
-
 
 
 
