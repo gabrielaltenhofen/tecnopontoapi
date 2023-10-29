@@ -127,6 +127,26 @@ server.get('/funcionario', (req, res) => {
   });
 });
 
+server.get('/funcionario/:usuario', (req, res) => {
+  const usuario = req.params.usuario;
+  if (!usuario) {
+    return res.status(400).json({ error: 'Parâmetro "usuario" é obrigatório na URL' });
+  }
+
+  const db = admin.database();
+  const ref = db.ref(`funcionario/${usuario}`);
+
+  ref.once('value', (snapshot) => {
+    const funcionario = snapshot.val();
+    if (!funcionario) {
+      return res.status(404).json({ error: 'Funcionário não encontrado.' });
+    }
+
+    res.json(funcionario);
+  });
+});
+
+
 server.use(router);
 
 server.listen(3000, () => {
