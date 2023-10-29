@@ -126,11 +126,10 @@ server.get('/funcionario', (req, res) => {
     res.json(funcionariosList);
   });
 });
-
 server.get('/funcionario/:usuario', (req, res) => {
   const usuario = req.params.usuario;
   if (!usuario) {
-    return res.status(400).json({ error: 'Parâmetro "usuario" é obrigatório na URL' });
+    return res.status(400).json({ error: 'Parâmetro "usuario" (tag) é obrigatório na URL' });
   }
 
   const db = admin.database();
@@ -143,12 +142,13 @@ server.get('/funcionario/:usuario', (req, res) => {
       return res.status(404).json({ error: 'Funcionário não encontrado.' });
     }
 
-    // A resposta deve ser um objeto, pois estamos buscando um único funcionário com base no ID.
+    // A resposta deve ser um objeto, pois estamos buscando um único funcionário com base na tag.
     const funcionarioEncontrado = Object.values(funcionario)[0];
     
     res.json(funcionarioEncontrado);
   });
 });
+
 
 
 server.use(router);
