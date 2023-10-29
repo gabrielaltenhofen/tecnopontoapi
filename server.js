@@ -134,21 +134,19 @@ server.get('/funcionario/:usuario', (req, res) => {
   }
 
   const db = admin.database();
-  const ref = db.ref('funcionario'); // Use o nome correto da tabela, que é 'funcionario'.
+  const ref = db.ref('funcionario');
 
-  ref.once('value', (snapshot) => {
-    const funcionarios = snapshot.val();
-    if (!funcionarios) {
-      return res.status(404).json({ error: 'Nenhum funcionário encontrado.' });
-    }
-
-    const funcionario = funcionarios[usuario];
+  ref.orderByChild('tag').equalTo(usuario).once('value', (snapshot) => {
+    const funcionario = snapshot.val();
 
     if (!funcionario) {
       return res.status(404).json({ error: 'Funcionário não encontrado.' });
     }
 
-    res.json(funcionario);
+    // A resposta deve ser um objeto, pois estamos buscando um único funcionário com base no ID.
+    const funcionarioEncontrado = Object.values(funcionario)[0];
+    
+    res.json(funcionarioEncontrado);
   });
 });
 
