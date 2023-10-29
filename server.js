@@ -134,10 +134,16 @@ server.get('/funcionario/:usuario', (req, res) => {
   }
 
   const db = admin.database();
-  const ref = db.ref(`funcionario/${usuario}`);
+  const ref = db.ref('funcionario'); // Use o nome correto da tabela, que é 'funcionario'.
 
   ref.once('value', (snapshot) => {
-    const funcionario = snapshot.val();
+    const funcionarios = snapshot.val();
+    if (!funcionarios) {
+      return res.status(404).json({ error: 'Nenhum funcionário encontrado.' });
+    }
+
+    const funcionario = funcionarios[usuario];
+
     if (!funcionario) {
       return res.status(404).json({ error: 'Funcionário não encontrado.' });
     }
