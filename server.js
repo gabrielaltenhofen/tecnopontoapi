@@ -48,19 +48,14 @@ server.get('/batidas_de_ponto/:usuario/:ano/:mes', (req, res) => {
 });
 
 server.get('/registrar_ponto', (req, res) => {
-  const usuario = req.query.usuario; // ID do funcionário
-  const dataHoraBrasilia = ajustarHoraParaBrasilia(new Date());
-  const hora = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  const ano = dataHoraBrasilia.getFullYear();
-  const mes = dataHoraBrasilia.getMonth() + 1; // Mês começa em 0
-  const dia = dataHoraBrasilia.getDate();
+  const tagUsuario = req.query.usuario; // Tag do funcionário
 
-  if (!usuario) {
-    return res.status(400).json({ error: 'Parâmetro "usuario" é obrigatório na URL' });
+  if (!tagUsuario) {
+    return res.status(400).json({ error: 'Parâmetro "usuario" (tag) é obrigatório na URL' });
   }
 
   const db = admin.database();
-  const refUsuario = db.ref(`funcionario/${usuario}`); // Referência ao usuário
+  const refUsuario = db.ref('funcionario').orderByChild('tag').equalTo(tagUsuario); // Referência ao usuário
 
   // Verifique o status do usuário
   refUsuario.once('value', (snapshotUsuario) => {
@@ -70,13 +65,21 @@ server.get('/registrar_ponto', (req, res) => {
       return res.status(400).json({ error: 'Usuário não encontrado.' });
     }
 
-    const statusUsuario = usuarioData.status;
+    // A resposta deve ser um objeto, pois estamos buscando um único funcionário com base na tag.
+    const funcionarioEncontrado = Object.values(usuarioData)[0];
+    const statusUsuario = funcionarioEncontrado.status;
 
     if (statusUsuario !== 'Ativo') {
       return res.status(400).json({ error: 'Usuário inativo. Não é possível registrar ponto.' });
     }
 
-    const ref = db.ref(`batidas_de_ponto/${usuario}/${ano}/${mes}/${dia}`);
+    const dataHoraBrasilia = ajustarHoraParaBrasilia(new Date());
+    const hora = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const ano = dataHoraBrasilia.getFullYear();
+    const mes = dataHoraBrasilia.getMonth() + 1; // Mês começa em 0
+    const dia = dataHoraBrasilia.getDate();
+
+    const ref = db.ref(`batidas_de_ponto/${tagUsuario}/${ano}/${mes}/${dia}`);
 
     // Verifique o número de batidas já registradas para o dia
     ref.once('value', (snapshot) => {
@@ -107,7 +110,7 @@ server.get('/registrar_ponto', (req, res) => {
   });
 });
 
-// Defina a rota para listar todos os funcionários com seus nomes e IDs
+// Defina a rota para listar todos os funcionários com suas tags e nomes
 server.get('/funcionario', (req, res) => {
   const db = admin.database();
   const ref = db.ref('funcionario'); // Use o nome correto da tabela, que é 'funcionario'.
@@ -119,37 +122,13 @@ server.get('/funcionario', (req, res) => {
     }
 
     const funcionariosList = Object.values(funcionarios).map(funcionario => ({
-      id: funcionario.tag, // Use o campo 'tag' como o ID
+      tag: funcionario.tag, // Use a tag do funcionário
       name: funcionario.name
     }));
 
     res.json(funcionariosList);
   });
 });
-server.get('/funcionario/:usuario', (req, res) => {
-  const usuario = req.params.usuario;
-  if (!usuario) {
-    return res.status(400).json({ error: 'Parâmetro "usuario" (tag) é obrigatório na URL' });
-  }
-
-  const db = admin.database();
-  const ref = db.ref('funcionario');
-
-  ref.orderByChild('tag').equalTo(usuario).once('value', (snapshot) => {
-    const funcionario = snapshot.val();
-
-    if (!funcionario) {
-      return res.status(404).json({ error: 'Funcionário não encontrado.' });
-    }
-
-    // A resposta deve ser um objeto, pois estamos buscando um único funcionário com base na tag.
-    const funcionarioEncontrado = Object.values(funcionario)[0];
-    
-    res.json(funcionarioEncontrado);
-  });
-});
-
-
 
 server.use(router);
 
