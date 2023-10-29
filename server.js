@@ -47,7 +47,6 @@ server.get('/batidas_de_ponto/:usuario/:ano/:mes', (req, res) => {
   });
 });
 
-
 server.get('/registrar_ponto', (req, res) => {
   const usuario = req.query.usuario; // ID do funcionário
   const dataHoraBrasilia = ajustarHoraParaBrasilia(new Date());
@@ -61,39 +60,52 @@ server.get('/registrar_ponto', (req, res) => {
   }
 
   const db = admin.database();
-  const ref = db.ref(`batidas_de_ponto/${usuario}/${ano}/${mes}/${dia}`);
+  const refUsuario = db.ref(`funcionario/${usuario}`); // Referência ao usuário
 
-  // Verifique o número de batidas já registradas para o dia
-  ref.once('value', (snapshot) => {
-    const batidasDoDia = snapshot.numChildren();
+  // Verifique o status do usuário
+  refUsuario.once('value', (snapshotUsuario) => {
+    const usuarioData = snapshotUsuario.val();
 
-    if (batidasDoDia >= 10) {
-      return res.status(400).json({ error: 'Limite de batidas de ponto para o dia atingido (máximo 4).' });
+    if (!usuarioData) {
+      return res.status(400).json({ error: 'Usuário não encontrado.' });
     }
 
-    // Determine o nome da variável para a nova batida
-    const nomeVariavelNovaBatida = `batida${batidasDoDia + 1}`;
-    const horaAtual = hora;
+    const statusUsuario = usuarioData.status;
 
-    const novaBatida = {
-      data_hora: horaAtual,
-    };
+    if (statusUsuario !== 'Ativo') {
+      return res.status(400).json({ error: 'Usuário inativo. Não é possível registrar ponto.' });
+    }
 
-    // Use `child` para definir a nova batida
-    ref.child(nomeVariavelNovaBatida).set(novaBatida, (error) => {
-      if (error) {
-        console.error('Erro ao registrar ponto:', error);
-        res.status(500).json({ error: 'Erro interno do servidor' });
-      } else {
-        res.json({ message: 'Batida de ponto registrada com sucesso!' });
+    const ref = db.ref(`batidas_de_ponto/${usuario}/${ano}/${mes}/${dia}`);
+
+    // Verifique o número de batidas já registradas para o dia
+    ref.once('value', (snapshot) => {
+      const batidasDoDia = snapshot.numChildren();
+
+      if (batidasDoDia >= 10) {
+        return res.status(400).json({ error: 'Limite de batidas de ponto para o dia atingido (máximo 10).' });
       }
+
+      // Determine o nome da variável para a nova batida
+      const nomeVariavelNovaBatida = `batida${batidasDoDia + 1}`;
+      const horaAtual = hora;
+
+      const novaBatida = {
+        data_hora: horaAtual,
+      };
+
+      // Use `child` para definir a nova batida
+      ref.child(nomeVariavelNovaBatida).set(novaBatida, (error) => {
+        if (error) {
+          console.error('Erro ao registrar ponto:', error);
+          res.status(500).json({ error: 'Erro interno do servidor' });
+        } else {
+          res.json({ message: 'Batida de ponto registrada com sucesso!' });
+        }
+      });
     });
   });
 });
-
-
-
-
 
 // Defina a rota para listar todos os funcionários com seus nomes e IDs
 server.get('/funcionario', (req, res) => {
