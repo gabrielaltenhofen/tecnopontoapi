@@ -130,6 +130,30 @@ server.get('/funcionario', (req, res) => {
   });
 });
 
+
+// Defina a rota para buscar um funcionário pelo ID
+server.get('/funcionario/:id', (req, res) => {
+  const id = req.params.id;
+
+  if (!id) {
+    return res.status(400).json({ error: 'Parâmetro "id" é obrigatório na URL' });
+  }
+
+  const db = admin.database();
+  const ref = db.ref('funcionario').child(id); // Use o ID para buscar o funcionário
+
+  ref.once('value', (snapshot) => {
+    const funcionario = snapshot.val();
+
+    if (!funcionario) {
+      return res.status(404).json({ error: 'Funcionário não encontrado.' });
+    }
+
+    res.json(funcionario);
+  });
+});
+
+
 server.use(router);
 
 server.listen(3000, () => {
