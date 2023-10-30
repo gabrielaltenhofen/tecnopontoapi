@@ -131,27 +131,32 @@ server.get('/funcionario', (req, res) => {
 });
 
 
-// Defina a rota para buscar um funcionário pelo ID
-server.get('/funcionario/:id', (req, res) => {
-  const id = req.params.id;
+// Defina a rota para buscar um funcionário pela tag
+server.get('/funcionario/tag/:tag', (req, res) => {
+  const tag = req.params.tag;
 
-  if (!id) {
-    return res.status(400).json({ error: 'Parâmetro "id" é obrigatório na URL' });
+  if (!tag) {
+    return res.status(400).json({ error: 'Parâmetro "tag" é obrigatório na URL' });
   }
 
   const db = admin.database();
-  const ref = db.ref('funcionario').child(id); // Use o ID para buscar o funcionário
+  const ref = db.ref('funcionario');
 
-  ref.once('value', (snapshot) => {
-    const funcionario = snapshot.val();
+  ref.orderByChild('tag').equalTo(tag).once('value', (snapshot) => {
+    const funcionarios = snapshot.val();
 
-    if (!funcionario) {
+    if (!funcionarios) {
       return res.status(404).json({ error: 'Funcionário não encontrado.' });
     }
+
+    // Assumindo que apenas um funcionário tem a tag fornecida,
+    // você pode pegar o primeiro funcionário encontrado.
+    const funcionario = Object.values(funcionarios)[0];
 
     res.json(funcionario);
   });
 });
+
 
 
 server.use(router);
