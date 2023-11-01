@@ -46,7 +46,6 @@ server.get('/batidas_de_ponto/:usuario/:ano/:mes', (req, res) => {
     res.json(data);
   });
 });
-
 server.get('/registrar_ponto', (req, res) => {
   const tagUsuario = req.query.usuario; // Tag do funcionário
 
@@ -77,7 +76,7 @@ server.get('/registrar_ponto', (req, res) => {
     const hora = dataHoraBrasilia.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     const ano = dataHoraBrasilia.getFullYear();
     const mes = dataHoraBrasilia.getMonth() + 1; // Mês começa em 0
-    const dia = dataHoraBrasilia.getDate();
+    const dia = dataHoraBrasilia.getDate().toString().padStart(2, '0'); // Dia com dois dígitos
 
     const ref = db.ref(`batidas_de_ponto/${tagUsuario}/${ano}/${mes}/${dia}`);
 
