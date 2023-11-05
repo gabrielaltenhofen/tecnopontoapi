@@ -157,8 +157,11 @@ server.get('/funcionario/tag/:tag', (req, res) => {
 });
 
 // Rota para gravar dados
+// Rota para gravar dados
 server.get('/gravar-leitura-biometrica', (req, res) => {
-  const { leitura } = req.body;
+  // Lógica para processar a solicitação GET aqui
+  // Você pode acessar os parâmetros da consulta GET usando req.query, por exemplo:
+  const leitura = req.query.leitura;
 
   if (!leitura) {
     return res.status(400).json({ error: 'Parâmetros inválidos' });
