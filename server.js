@@ -157,7 +157,7 @@ server.get('/funcionario/tag/:tag', (req, res) => {
 });
 
 // Rota para gravar dados
-server.post('/gravar-leitura-biometrica', (req, res) => {
+server.get('/gravar-leitura-biometrica', (req, res) => {
   const { leitura } = req.body;
 
   if (!leitura) {
