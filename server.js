@@ -180,6 +180,30 @@ server.get('/gravar-leitura-biometrica', (req, res) => {
     });
 });
 
+// Defina a rota para retornar os dados do Firebase de biometria no formato desejado
+server.get('/dados_biometria', (req, res) => {
+  const db = admin.database();
+  const ref = db.ref('dados_biometria');
+
+  ref.once('value', (snapshot) => {
+    const dadosBiometria = snapshot.val();
+    
+    if (!dadosBiometria) {
+      return res.status(404).json({ error: 'Nenhum dado de biometria encontrado.' });
+    }
+
+    const dadosFormatados = {};
+    let index = 1;
+
+    // Iterar pelos dados e formatá-los no formato desejado
+    Object.values(dadosBiometria).forEach((dado) => {
+      dadosFormatados[index] = dado.tag;
+      index++;
+    });
+
+    res.json(dadosFormatados);
+  });
+});
 
 
 server.use(router);
