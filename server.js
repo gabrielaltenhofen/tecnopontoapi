@@ -156,6 +156,27 @@ server.get('/funcionario/tag/:tag', (req, res) => {
   });
 });
 
+// Rota para gravar dados
+server.post('/gravar-leitura-biometrica', (req, res) => {
+  const { leitura } = req.body;
+
+  if (!leitura) {
+    return res.status(400).json({ error: 'Parâmetros inválidos' });
+  }
+
+  const db = admin.database();
+  const ref = db.ref('/leituras');
+
+  // Gravar a leitura no Firebase
+  ref.push({ leitura })
+    .then(() => {
+      res.status(201).json({ message: 'Leitura gravada com sucesso' });
+    })
+    .catch((error) => {
+      res.status(500).json({ error: 'Erro ao gravar leitura no Firebase' });
+    });
+});
+
 
 
 server.use(router);
