@@ -19,7 +19,7 @@
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
-  "author": "Fábio Cordeiro",
-  "license": "ISC",
+  "author": "Gabriel Altenhofen",
+  "license": "",
   "description": ""
 }
