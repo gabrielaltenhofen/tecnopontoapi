@@ -1,12 +1,5 @@
 {
-  "clientes": [
-    {
-      "id": 1,
-      "nome": "João da Silva",
-      "telefone": "123456789",
-      "endereco": "Rua dos Animais, 123"
-    }
-  ],
+
   "animais": [
     {
       "id": 1,
