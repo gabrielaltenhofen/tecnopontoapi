@@ -1,61 +1,75 @@
 {
-
-  "animais": [
-    {
-      "id": 1,
-      "nome": "Rex",
-      "especie": "Cachorro",
-      "raca": "Labrador",
-      "idade": 3,
-      "cliente_id": 1
+  "batidas_de_ponto": {
+    "usuario1": {
+      "2024": {
+        "5": {
+          "01": {
+            "batida1": {
+              "data_hora": "08:00"
+            },
+            "batida2": {
+              "data_hora": "12:00"
+            }
+          },
+          "02": {
+            "batida1": {
+              "data_hora": "07:45"
+            },
+            "batida2": {
+              "data_hora": "12:15"
+            },
+            "batida3": {
+              "data_hora": "18:00"
+            }
+          }
+        }
+      }
     },
-    {
-      "id": 2,
-      "nome": "Mimi",
-      "especie": "Gato",
-      "raca": "Siamês",
-      "idade": 2,
-      "cliente_id": 1
-    },
-    {
-      "id": 3,
-      "nome": "Lola",
-      "especie": "Cachorro",
-      "raca": "Poodle",
-      "idade": 5,
-      "cliente_id": 2
-    },
-    {
-      "id": 4,
-      "nome": "Nina",
-      "especie": "Gato",
-      "raca": "Persa",
-      "idade": 1,
-      "cliente_id": 2
+    "usuario2": {
+      "2024": {
+        "5": {
+          "01": {
+            "batida1": {
+              "data_hora": "08:30"
+            },
+            "batida2": {
+              "data_hora": "12:30"
+            },
+            "batida3": {
+              "data_hora": "18:30"
+            }
+          },
+          "02": {
+            "batida1": {
+              "data_hora": "07:50"
+            },
+            "batida2": {
+              "data_hora": "12:20"
+            },
+            "batida3": {
+              "data_hora": "17:55"
+            }
+          }
+        }
+      }
     }
-  ],
-  "produtos": [
-    {
-      "id": 1,
-      "nome": "Ração para cães",
-      "marca": "Premier",
-      "preco": 50.99,
-      "quantidade_estoque": 100
+  },
+  "funcionario": {
+    "funcionario1": {
+      "tag": "usuario1",
+      "name": "Funcionário 1"
     },
-    {
-      "id": 2,
-      "nome": "Areia sanitária para gatos",
-      "marca": "Chalesco",
-      "preco": 25.99,
-      "quantidade_estoque": 50
+    "funcionario2": {
+      "tag": "usuario2",
+      "name": "Funcionário 2"
     }
-  ],
-  "servicos": [
-    {
-      "id": 1,
-      "nome": "Banho e tosa",
-      "preco": 80.0,
-      "duracao_minutos": 120
+  },
+  "dados_biometria": {
+    "1": {
+      "tag": "usuario1"
+    },
+    "2": {
+      "tag": "usuario2"
     }
-  ]
+  }
 }
