@@ -152,4 +152,4 @@ Este projeto é licenciado sob a [Licença MIT](https://github.com/gabrielaltenh
 
 Para perguntas, sugestões ou problemas relacionados a este projeto, sinta-se à vontade para entrar em contato com o mantenedor:
 
-Gabriel Altenhofen - gabriel@exemplo.com
+Gabriel Altenhofen - gabrielgirardih@gmail.com
